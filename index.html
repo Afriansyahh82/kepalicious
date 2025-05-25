@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kepalicious - Nasi Kepal & Kimbab Terbaik</title>
+    <meta
+      name="description"
+      content="Kepalicious menyajikan nasi kepal dan kimbab dengan cita rasa autentik dan bahan berkualitas terbaik. Pesan sekarang!"
+    />
+
+    <!-- External Libraries -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Custom JS -->
+    <script defer src="script.js"></script>
+  </head>
+  <body
+    class="bg-gradient-to-br from-yellow-50 to-orange-50 text-gray-800 font-sans scroll-smooth"
+  >
+    <!-- Notification Toast - UPDATED -->
+    <div id="notification" style="display: none">
+      <div class="flex items-center gap-2">
+        <i data-feather="check-circle" class="w-5 h-5"></i>
+        <span id="notification-text"
+          >Item berhasil ditambahkan ke keranjang!</span
+        >
+        <button
+          onclick="closeNotification()"
+          class="ml-4 text-white hover:text-gray-200 font-bold text-lg"
+          aria-label="Close notification"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div
+      id="loading-overlay"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center"
+    >
+      <div class="bg-white p-6 rounded-lg text-center">
+        <div class="loading mx-auto mb-4"></div>
+        <p>Memproses pesanan...</p>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <header
+      class="bg-white/90 backdrop-blur-sm p-6 flex justify-between items-center sticky top-0 z-40 shadow-sm"
+    >
+      <!-- Logo -->
+      <h1 class="text-2xl font-extrabold text-gray-900">
+        <span class="text-yellow-500">Kepal</span>icious
+      </h1>
+
+      <!-- Hamburger Menu Button -->
+      <button
+        id="menu-toggle"
+        class="md:hidden text-2xl text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+      >
+        <i data-feather="menu"></i>
+      </button>
+
+      <!-- Navigation Menu -->
+      <nav
+        id="nav-menu"
+        class="hidden md:flex flex-col md:flex-row md:items-center gap-4 md:gap-8 absolute md:static top-20 left-0 w-full md:w-auto bg-white md:bg-transparent px-6 py-4 md:p-0 shadow-lg md:shadow-none font-medium text-gray-800 rounded-b-lg md:rounded-none"
+      >
+        <a
+          href="#beranda"
+          class="nav-link hover:text-yellow-500 transition-colors py-2 md:py-0"
+          >Beranda</a
+        >
+        <a
+          href="#menu"
+          class="nav-link hover:text-yellow-500 transition-colors py-2 md:py-0"
+          >Menu</a
+        >
+        <a
+          href="#tentang"
+          class="nav-link hover:text-yellow-500 transition-colors py-2 md:py-0"
+          >Tentang Kami</a
+        >
+        <a
+          href="#kontak"
+          class="nav-link hover:text-yellow-500 transition-colors py-2 md:py-0"
+          >Kontak</a
+        >
+      </nav>
+
+      <!-- Cart Icon -->
+      <button
+        id="open-cart"
+        class="hidden md:flex relative text-2xl p-2 rounded-lg hover:bg-gray-100 transition-colors"
+      >
+        <i data-feather="shopping-cart"></i>
+        <span
+          id="cart-count"
+          class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center font-bold hidden"
+          >0</span
+        >
+      </button>
+    </header>
+
+    <!-- Hero Section -->
+    <section
+      id="beranda"
+      class="bg-gradient-to-r from-yellow-100 to-orange-100 px-8 md:px-16 py-20 flex flex-col md:flex-row items-center justify-between"
+    >
+      <div class="md:w-1/2 space-y-6 fade-in">
+        <h2
+          class="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight"
+        >
+          Nikmatnya <span class="text-yellow-500">Nasi Kepal & Kimbab</span
+          ><br />
+          <span class="text-gray-900">Buat Harimu Spesial</span>
+        </h2>
+        <p class="text-gray-600 text-lg leading-relaxed">
+          Cita rasa autentik dalam setiap gigitan. Dibuat dengan bahan-bahan
+          segar dan berkualitas terbaik untuk memanjakan lidahmu.
+        </p>
+        <div class="flex gap-4">
+          <a
+            href="#menu"
+            class="bg-yellow-400 text-white font-semibold px-8 py-4 rounded-xl shadow-lg hover:bg-yellow-500 hover:scale-105 transition-all duration-300"
+          >
+            Lihat Menu
+          </a>
+          <a
+            href="#tentang"
+            class="border-2 border-gray-600 px-8 py-4 rounded-xl text-gray-800 hover:bg-gray-100 hover:scale-105 transition-all duration-300"
+          >
+            Tentang Kami
+          </a>
+        </div>
+      </div>
+
+      <div class="md:w-1/2 mt-12 md:mt-0 relative">
+        <img
+          src="assets/images/heros.jpg"
+          alt="Hero"
+          class="rounded-2xl shadow-2xl w-full max-w-md mx-auto"
+        />
+
+        <!-- Floating Badges -->
+        <div
+          class="absolute top-4 right-4 bg-white rounded-xl shadow-lg p-3 flex items-center gap-3 bounce-in"
+        >
+          <div class="text-pink-500 text-2xl">❤️</div>
+          <div>
+            <p class="font-semibold text-gray-800">Dibuat dengan Cinta</p>
+            <p class="text-sm text-gray-500">Resep Rahasia Spesial</p>
+          </div>
+        </div>
+
+        <div
+          class="absolute bottom-4 left-4 bg-white rounded-xl shadow-lg p-3 flex items-center gap-3 bounce-in"
+        >
+          <div class="text-green-500 text-2xl">✅</div>
+          <div>
+            <p class="font-semibold text-gray-800">Bahan Segar</p>
+            <p class="text-sm text-gray-500">Dipilih Langsung Setiap Hari</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="bg-white py-16 px-6">
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-4xl font-bold text-center mb-4">Menu Kepalicious</h2>
+        <p class="text-center text-gray-600 mb-12 text-lg">
+          Menu nasi kepal & kimbab lezat dari bahan berkualitas
+        </p>
+
+        <!-- Category Filter -->
+        <div class="flex justify-center mb-8">
+          <div class="flex gap-2 bg-gray-100 p-2 rounded-lg">
+            <button
+              class="category-filter active px-6 py-2 rounded-lg font-medium transition-all"
+              data-category="all"
+            >
+              Semua Menu
+            </button>
+            <button
+              class="category-filter px-6 py-2 rounded-lg font-medium transition-all"
+              data-category="nasi-kepal"
+            >
+              Nasi Kepal
+            </button>
+            <button
+              class="category-filter px-6 py-2 rounded-lg font-medium transition-all"
+              data-category="kimbab"
+            >
+              Kimbab
+            </button>
+          </div>
+        </div>
+
+        <!-- Menu Grid -->
+        <div
+          id="menu-container"
+          class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+        >
+          <!-- Menu items will be loaded here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section class="bg-gradient-to-br from-yellow-50 to-orange-50 py-16 px-6">
+      <div class="max-w-6xl mx-auto text-center">
+        <h2 class="text-4xl font-bold mb-4">Mengapa Memilih Kepalicious?</h2>
+        <p class="text-gray-600 mb-12 text-lg">
+          Kami berkomitmen untuk menyajikan makanan terbaik dengan kualitas
+          terjamin dan rasa lezat yang tidak terlupakan.
+        </p>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div
+            class="bg-white rounded-xl p-6 shadow-lg text-center hover:scale-105 transition-transform duration-300"
+          >
+            <div
+              class="bg-yellow-400 w-16 h-16 flex items-center justify-center rounded-full mx-auto mb-4"
+            >
+              <i data-feather="eye" class="w-8 h-8 text-white"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Bahan Berkualitas</h3>
+            <p class="text-sm text-gray-600">
+              Semua bahan baku kami dipilih langsung setiap hari untuk menjamin
+              kesegaran dan kualitas terbaik.
+            </p>
+          </div>
+
+          <div
+            class="bg-white rounded-xl p-6 shadow-lg text-center hover:scale-105 transition-transform duration-300"
+          >
+            <div
+              class="bg-yellow-400 w-16 h-16 flex items-center justify-center rounded-full mx-auto mb-4"
+            >
+              <i data-feather="clock" class="w-8 h-8 text-white"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Pelayanan Cepat</h3>
+            <p class="text-sm text-gray-600">
+              Kami memproses pesanan dengan cepat dan tepat. Waktu adalah hal
+              berharga bagi Anda.
+            </p>
+          </div>
+
+          <div
+            class="bg-white rounded-xl p-6 shadow-lg text-center hover:scale-105 transition-transform duration-300"
+          >
+            <div
+              class="bg-yellow-400 w-16 h-16 flex items-center justify-center rounded-full mx-auto mb-4"
+            >
+              <i data-feather="thumbs-up" class="w-8 h-8 text-white"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Rasa Terjamin</h3>
+            <p class="text-sm text-gray-600">
+              Resep spesial kami dijamin membuat Anda ketagihan dan ingin
+              memesan lagi.
+            </p>
+          </div>
+
+          <div
+            class="bg-white rounded-xl p-6 shadow-lg text-center hover:scale-105 transition-transform duration-300"
+          >
+            <div
+              class="bg-yellow-400 w-16 h-16 flex items-center justify-center rounded-full mx-auto mb-4"
+            >
+              <i data-feather="credit-card" class="w-8 h-8 text-white"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Pembayaran Mudah</h3>
+            <p class="text-sm text-gray-600">
+              Kami menerima berbagai metode pembayaran termasuk QRIS untuk
+              kenyamanan Anda.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="tentang" class="py-16 px-6 bg-white">
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-4xl font-extrabold text-center mb-4">
+          Tentang <span class="text-yellow-500">Kepalicious</span>
+        </h2>
+        <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12 text-lg">
+          Kisah kami dimulai dari kecintaan akan makanan Korea dan Jepang yang
+          dikombinasikan dengan cita rasa lokal.
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <div class="relative">
+            <img
+              src="assets/images/team.jpg"
+              alt="Tentang Kami"
+              class="rounded-xl shadow-2xl"
+            />
+            <div
+              class="absolute bottom-4 right-4 bg-yellow-400 text-white px-4 py-2 text-sm font-semibold rounded-lg shadow-md"
+            >
+              <p class="font-bold">Berdiri sejak 2025</p>
+              <p>Melayani dengan sepenuh hati</p>
+            </div>
+          </div>
+
+          <div class="space-y-8">
+            <div>
+              <h3 class="text-2xl font-bold text-gray-800 mb-4">Visi Kami</h3>
+              <p class="text-gray-700 leading-relaxed">
+                Menjadi pionir kuliner nasi kepal dan kimbab dengan inovasi rasa
+                dan pelayanan terbaik untuk kepuasan pelanggan.
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-2xl font-bold text-gray-800 mb-4">Misi Kami</h3>
+              <ul class="space-y-3 text-gray-700">
+                <li class="flex items-start">
+                  <span class="text-yellow-500 mr-3 mt-1">✓</span>
+                  Menghadirkan cita rasa autentik dengan bahan berkualitas
+                  terbaik
+                </li>
+                <li class="flex items-start">
+                  <span class="text-yellow-500 mr-3 mt-1">✓</span>
+                  Memberikan pelayanan ramah dan cepat kepada setiap pelanggan
+                </li>
+                <li class="flex items-start">
+                  <span class="text-yellow-500 mr-3 mt-1">✓</span>
+                  Menciptakan inovasi menu yang selalu menarik dan berbeda
+                </li>
+                <li class="flex items-start">
+                  <span class="text-yellow-500 mr-3 mt-1">✓</span>
+                  Membangun hubungan jangka panjang dengan pelanggan setia
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 class="text-2xl font-bold text-gray-800 mb-4">
+                Nilai-Nilai Kami
+              </h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div
+                  class="bg-yellow-50 p-4 rounded-lg border border-yellow-200"
+                >
+                  <h4 class="font-bold text-gray-800 mb-2">Kualitas</h4>
+                  <p class="text-sm text-gray-600">
+                    Tidak pernah berkompromi dengan kualitas bahan dan rasa
+                  </p>
+                </div>
+                <div
+                  class="bg-yellow-50 p-4 rounded-lg border border-yellow-200"
+                >
+                  <h4 class="font-bold text-gray-800 mb-2">Pelayanan</h4>
+                  <p class="text-sm text-gray-600">
+                    Kepuasan pelanggan adalah prioritas utama kami
+                  </p>
+                </div>
+                <div
+                  class="bg-yellow-50 p-4 rounded-lg border border-yellow-200"
+                >
+                  <h4 class="font-bold text-gray-800 mb-2">Inovasi</h4>
+                  <p class="text-sm text-gray-600">
+                    Selalu menciptakan menu baru yang menarik
+                  </p>
+                </div>
+                <div
+                  class="bg-yellow-50 p-4 rounded-lg border border-yellow-200"
+                >
+                  <h4 class="font-bold text-gray-800 mb-2">Kebersihan</h4>
+                  <p class="text-sm text-gray-600">
+                    Menjaga standar kebersihan tertinggi dalam proses pembuatan
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section
+      id="kontak"
+      class="py-16 px-6 bg-gradient-to-br from-yellow-50 to-orange-50"
+    >
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-4xl font-bold text-center mb-4">Hubungi Kami</h2>
+        <p class="text-center text-gray-600 mb-12 text-lg">
+          Kami siap melayani pertanyaan, saran, atau pesanan Anda. Jangan ragu
+          untuk menghubungi kami!
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Contact Form -->
+          <div class="bg-white p-8 rounded-xl shadow-lg">
+            <h3 class="text-2xl font-bold mb-6">Kirim Pesan</h3>
+            <form id="contact-form" class="space-y-6">
+              <div class="flex flex-col md:flex-row gap-4">
+                <input
+                  type="text"
+                  id="contact-name"
+                  placeholder="Masukkan nama lengkap Anda"
+                  class="w-full p-4 border-2 rounded-lg bg-gray-50 focus:border-yellow-400 focus:outline-none transition-colors"
+                  required
+                />
+                <input
+                  type="email"
+                  id="contact-email"
+                  placeholder="Masukkan email Anda"
+                  class="w-full p-4 border-2 rounded-lg bg-gray-50 focus:border-yellow-400 focus:outline-none transition-colors"
+                  required
+                />
+              </div>
+              <input
+                type="text"
+                id="contact-subject"
+                placeholder="Apa yang ingin Anda diskusikan?"
+                class="w-full p-4 border-2 rounded-lg bg-gray-50 focus:border-yellow-400 focus:outline-none transition-colors"
+                required
+              />
+              <textarea
+                id="contact-message"
+                placeholder="Tulis pesan Anda di sini…"
+                rows="5"
+                class="w-full p-4 border-2 rounded-lg bg-gray-50 focus:border-yellow-400 focus:outline-none transition-colors"
+                required
+              ></textarea>
+              <button
+                type="submit"
+                class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-6 py-4 rounded-lg transition-colors"
+              >
+                Kirim Pesan
+              </button>
+            </form>
+          </div>
+
+          <!-- Contact Info -->
+          <div class="bg-white p-8 rounded-xl shadow-lg">
+            <h3 class="text-2xl font-bold mb-6">Informasi Kontak</h3>
+            <div class="space-y-6 text-gray-700">
+              <div class="flex items-start gap-4">
+                <div class="bg-yellow-400 p-3 rounded-lg">
+                  <i data-feather="map-pin" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-lg">Alamat</h4>
+                  <p>SMK Negeri 4 Padalarang</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="bg-yellow-400 p-3 rounded-lg">
+                  <i data-feather="mail" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-lg">Email</h4>
+                  <a
+                    href="mailto:info@kepalicious.com"
+                    class="text-blue-500 hover:underline"
+                  >
+                    info@kepalicious.com
+                  </a>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="bg-green-500 p-3 rounded-lg">
+                  <i
+                    data-feather="message-circle"
+                    class="w-6 h-6 text-white"
+                  ></i>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-lg">WhatsApp</h4>
+                  <a
+                    href="https://wa.me/6283862344516"
+                    target="_blank"
+                    class="text-blue-500 hover:underline"
+                  >
+                    +62 838-6234-4516
+                  </a>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="bg-yellow-400 p-3 rounded-lg">
+                  <i data-feather="clock" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-lg">Jam Operasional</h4>
+                  <p>Senin – Minggu: 10:00 – 21:00</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 px-6">
+      <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+        <!-- Logo & Description -->
+        <div>
+          <h3 class="text-2xl font-bold mb-4">
+            <span class="text-yellow-400">Kepa</span>licious
+          </h3>
+          <p class="text-gray-300 mb-6 leading-relaxed">
+            Menyajikan nasi kepal dan kimbab dengan cita rasa autentik dan bahan
+            berkualitas terbaik.
+          </p>
+          <div class="flex space-x-4 text-xl">
+            <a
+              href="#"
+              class="text-gray-300 hover:text-yellow-400 transition-colors"
+            >
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a
+              href="#"
+              class="text-gray-300 hover:text-yellow-400 transition-colors"
+            >
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a
+              href="#"
+              class="text-gray-300 hover:text-yellow-400 transition-colors"
+            >
+              <i class="fab fa-twitter"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Menu Links -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Menu Kami</h4>
+          <ul class="space-y-2 text-gray-300">
+            <li>
+              <a href="#menu" class="hover:text-yellow-400 transition-colors"
+                >Nasi Kepal</a
+              >
+            </li>
+            <li>
+              <a href="#menu" class="hover:text-yellow-400 transition-colors"
+                >Kimbab</a
+              >
+            </li>
+            <li>
+              <a href="#menu" class="hover:text-yellow-400 transition-colors"
+                >Paket Spesial</a
+              >
+            </li>
+            <li>
+              <a href="#menu" class="hover:text-yellow-400 transition-colors"
+                >Menu Baru</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <!-- Important Links -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Link Penting</h4>
+          <ul class="space-y-2 text-gray-300">
+            <li>
+              <a href="#tentang" class="hover:text-yellow-400 transition-colors"
+                >Tentang Kami</a
+              >
+            </li>
+            <li>
+              <a href="#kontak" class="hover:text-yellow-400 transition-colors"
+                >Kontak</a
+              >
+            </li>
+            <li>
+              <a href="#" class="hover:text-yellow-400 transition-colors"
+                >FAQ</a
+              >
+            </li>
+            <li>
+              <a href="#" class="hover:text-yellow-400 transition-colors"
+                >Syarat & Ketentuan</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <!-- Contact Info -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Kontak Kami</h4>
+          <ul class="space-y-4 text-gray-300">
+            <li class="flex items-start gap-3">
+              <span class="text-yellow-400">📍</span>
+              <span>SMK Negeri 4 Padalarang</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-yellow-400">✉️</span>
+              <span>info@kepalicious.com</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-yellow-400">📞</span>
+              <span>+62 838-6234-4516</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div
+        class="mt-12 border-t border-gray-700 pt-6 text-center text-gray-400"
+      >
+        <p>&copy; 2025 Kepalicious. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <!-- Cart Sidebar -->
+    <div
+      id="cart-sidebar"
+      class="fixed top-0 right-0 w-96 h-full bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col"
+    >
+      <!-- Cart Header -->
+      <div class="p-6 border-b bg-yellow-50 flex justify-between items-center">
+        <h2 class="text-xl font-bold">Keranjang Belanja</h2>
+        <button
+          id="close-cart"
+          class="text-gray-600 hover:text-red-500 transition-colors p-2"
+        >
+          <i data-feather="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <!-- Cart Items -->
+      <div id="cart-items" class="flex-1 overflow-y-auto p-6">
+        <div id="empty-cart" class="text-center py-12">
+          <i
+            data-feather="shopping-cart"
+            class="w-16 h-16 text-gray-300 mx-auto mb-4"
+          ></i>
+          <p class="text-gray-500 text-lg">Keranjang masih kosong</p>
+          <p class="text-gray-400">Yuk, pilih menu favoritmu!</p>
+        </div>
+      </div>
+
+      <!-- Cart Footer -->
+      <div id="cart-footer" class="p-6 border-t bg-gray-50 space-y-4 hidden">
+        <div class="flex justify-between items-center text-xl font-bold">
+          <span>Total:</span>
+          <span id="cart-total">Rp 0</span>
+        </div>
+
+        <div class="flex gap-2">
+          <button
+            id="clear-cart"
+            class="flex-1 bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-colors font-medium"
+          >
+            <i data-feather="trash-2" class="w-4 h-4 inline mr-2"></i>
+            Kosongkan
+          </button>
+          <button
+            id="whatsapp-checkout"
+            class="flex-1 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors font-medium"
+          >
+            <i data-feather="message-circle" class="w-4 h-4 inline mr-2"></i>
+            WhatsApp
+          </button>
+        </div>
+
+        <button
+          id="qris-checkout"
+          class="w-full bg-yellow-400 text-white py-3 rounded-lg hover:bg-yellow-500 transition-colors font-medium"
+        >
+          <i data-feather="smartphone" class="w-4 h-4 inline mr-2"></i>
+          Bayar dengan QRIS
+        </button>
+      </div>
+    </div>
+
+    <!-- QRIS Payment Modal -->
+    <div
+      id="qris-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4"
+    >
+      <div class="bg-white rounded-xl max-w-md w-full p-6">
+        <div class="text-center">
+          <h3 class="text-xl font-bold mb-4">Pembayaran QRIS</h3>
+          <div class="bg-gray-100 p-6 rounded-lg mb-4">
+            <img
+              id="qris-code"
+              src="/api/placeholder/250/250"
+              alt="QRIS Code"
+              class="mx-auto mb-4"
+            />
+            <p class="text-sm text-gray-600">
+              Scan QR code dengan aplikasi pembayaran Anda
+            </p>
+          </div>
+          <div class="text-center mb-4">
+            <p class="text-lg font-semibold">Total Pembayaran:</p>
+            <p id="qris-total" class="text-2xl font-bold text-yellow-500">
+              Rp 0
+            </p>
+          </div>
+          <div class="flex gap-3">
+            <button
+              id="close-qris"
+              class="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              Batal
+            </button>
+            <button
+              id="confirm-payment"
+              class="flex-1 bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition-colors"
+            >
+              Sudah Bayar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Cart Button -->
+    <button
+      id="mobile-cart-btn"
+      class="md:hidden fixed bottom-6 right-6 bg-yellow-400 text-white p-4 rounded-full shadow-lg z-40 hover:bg-yellow-500 transition-colors"
+    >
+      <i data-feather="shopping-cart" class="w-6 h-6"></i>
+      <span
+        id="mobile-cart-count"
+        class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center font-bold hidden"
+        >0</span
+      >
+    </button>
+
+    <!-- Initialize Feather Icons -->
+    <script>
+      feather.replace();
+    </script>
+  </body>
+</html>
