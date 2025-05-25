@@ -365,7 +365,7 @@ function whatsappCheckout() {
 
   message += `\nTotal: Rp ${total.toLocaleString()}\n\nTerima kasih!`;
 
-  const whatsappURL = `https://wa.me/6283862344516?text=${encodeURIComponent(
+  const whatsappURL = `https://wa.me/62895365232815?text=${encodeURIComponent(
     message
   )}`;
   window.open(whatsappURL, "_blank");
