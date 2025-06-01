@@ -8,7 +8,7 @@ const menuData = [
     name: "Nasi Kepal",
     price: 6000,
     category: "nasi-kepal",
-    description: "Nasi kepal dengan isi Ayam Suwir",
+    description: "Nasi kepal dengan isi Ayam Suwir Daun Jeruk Balado",
     image: "assets/images/nasi-kepal.jpg", // Hapus leading slash
   },
   {
@@ -16,7 +16,7 @@ const menuData = [
     name: "Kimbab",
     price: 6000,
     category: "kimbab",
-    description: "Kimbab isi Sayuran",
+    description: "Kimbab isi Ayam dan Sayuran",
     image: "assets/images/kimbab.jpg", // Hapus leading slash
   },
 ];
