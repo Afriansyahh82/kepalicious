@@ -1,0 +1,12 @@
+# Abaikan folder node_modules (hasil npm install)
+node_modules/
+
+# Abaikan file konfigurasi sistem macOS (kalau kamu pakai Mac)
+.DS_Store
+
+# Abaikan file environment (kalau ada)
+.env
+
+# Abaikan folder build atau dist (jika kamu pakai proses build nanti)
+dist/
+build/

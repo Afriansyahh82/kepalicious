@@ -70,7 +70,7 @@
       <!-- Hamburger Menu Button -->
       <button
         id="menu-toggle"
-        class="md:hidden text-2xl text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+        class="md:hidden text-2xl text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition"
       >
         <i data-feather="menu"></i>
       </button>
@@ -78,7 +78,7 @@
       <!-- Navigation Menu -->
       <nav
         id="nav-menu"
-        class="hidden md:flex flex-col md:flex-row md:items-center gap-4 md:gap-8 absolute md:static top-20 left-0 w-full md:w-auto bg-white md:bg-transparent px-6 py-4 md:p-0 shadow-lg md:shadow-none font-medium text-gray-800 rounded-b-lg md:rounded-none"
+        class="hidden flex-col md:flex md:flex-row md:items-center gap-4 md:gap-8 absolute md:static top-16 left-0 w-full md:w-auto bg-white md:bg-transparent px-6 py-4 md:p-0 shadow-md md:shadow-none font-medium text-gray-800 rounded-b-lg md:rounded-none z-50"
       >
         <a
           href="#beranda"
@@ -122,11 +122,9 @@
       class="bg-gradient-to-r from-yellow-100 to-orange-100 px-8 md:px-16 py-20 flex flex-col md:flex-row items-center justify-between"
     >
       <div class="md:w-1/2 space-y-6 fade-in">
-        <h2
-          class="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight"
-        >
-          Nikmatnya <span class="text-yellow-500">Nasi Kepal & Kimbab</span
-          ><br />
+        <h2 class="text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
+          Nikmatnya<br />
+          <span class="text-yellow-500">Nasi Kepal & Kimbab</span><br />
           <span class="text-gray-900">Buat Harimu Spesial</span>
         </h2>
         <p class="text-gray-600 text-lg leading-relaxed">
@@ -456,55 +454,59 @@
           <div class="bg-white p-8 rounded-xl shadow-lg">
             <h3 class="text-2xl font-bold mb-6">Informasi Kontak</h3>
             <div class="space-y-6 text-gray-700">
+              <!-- Lokasi -->
               <div class="flex items-start gap-4">
                 <div class="bg-yellow-400 p-3 rounded-lg">
-                  <i data-feather="map-pin" class="w-6 h-6 text-white"></i>
+                  <i class="bi bi-geo-alt-fill w-6 h-6 text-white"></i>
                 </div>
                 <div>
                   <h4 class="font-semibold text-lg">Alamat</h4>
                   <p>SMK Negeri 4 Padalarang</p>
                 </div>
               </div>
-              <div class="flex items-start gap-4">
-                <div class="bg-yellow-400 p-3 rounded-lg">
-                  <i data-feather="mail" class="w-6 h-6 text-white"></i>
+              <!-- Instagram -->
+              <!-- <div class="flex items-start gap-4">
+                <div class="bg-green-500 p-3 rounded-lg">
+                  <i class="bi bi-instagram w-7 h-7 text-white"></i>
                 </div>
                 <div>
-                  <h4 class="font-semibold text-lg">Email</h4>
+                  <h4 class="font-semibold text-lg">Instagram</h4>
                   <a
-                    href="mailto:info@kepalicious.com"
-                    class="text-blue-500 hover:underline"
+                    href="https://instagram/kepalicious/"
+                    target="_blank"
+                    class="hover:underline"
                   >
-                    info@kepalicious.com
+                    @kepalicious
                   </a>
                 </div>
-              </div>
+              </div> -->
+              <!-- WhatsApp -->
               <div class="flex items-start gap-4">
                 <div class="bg-green-500 p-3 rounded-lg">
-                  <i
-                    data-feather="message-circle"
-                    class="w-6 h-6 text-white"
-                  ></i>
+                  <i class="bi bi-whatsapp w-7 h-7 text-white"></i>
                 </div>
                 <div>
                   <h4 class="font-semibold text-lg">WhatsApp</h4>
                   <a
                     href="https://wa.me/6283862344516"
                     target="_blank"
-                    class="text-blue-500 hover:underline"
+                    class="hover:underline"
                   >
                     +62 838-6234-4516
                   </a>
                 </div>
               </div>
-              <div class="flex items-start gap-4">
-                <div class="bg-yellow-400 p-3 rounded-lg">
-                  <i data-feather="clock" class="w-6 h-6 text-white"></i>
-                </div>
-                <div>
-                  <h4 class="font-semibold text-lg">Jam Operasional</h4>
-                  <p>Senin – Minggu: 10:00 – 21:00</p>
-                </div>
+              <!-- Map -->
+              <div class="map">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3182.4916002493455!2d107.49002837388645!3d-6.848463566995598!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68e3583906d917%3A0x5a173bbbcf5f3e67!2sSMK%20Negeri%204%20Padalarang!5e1!3m2!1sid!2sid!4v1748705801949!5m2!1sid!2sid"
+                  width="500"
+                  height="250"
+                  style="border: 0"
+                  allowfullscreen=""
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                ></iframe>
               </div>
             </div>
           </div>
@@ -524,7 +526,7 @@
             Menyajikan nasi kepal dan kimbab dengan cita rasa autentik dan bahan
             berkualitas terbaik.
           </p>
-          <div class="flex space-x-4 text-xl">
+          <!-- <div class="flex space-x-4 text-xl">
             <a
               href="#"
               class="text-gray-300 hover:text-yellow-400 transition-colors"
@@ -543,7 +545,7 @@
             >
               <i class="fab fa-twitter"></i>
             </a>
-          </div>
+          </div> -->
         </div>
 
         <!-- Menu Links -->
@@ -558,16 +560,6 @@
             <li>
               <a href="#menu" class="hover:text-yellow-400 transition-colors"
                 >Kimbab</a
-              >
-            </li>
-            <li>
-              <a href="#menu" class="hover:text-yellow-400 transition-colors"
-                >Paket Spesial</a
-              >
-            </li>
-            <li>
-              <a href="#menu" class="hover:text-yellow-400 transition-colors"
-                >Menu Baru</a
               >
             </li>
           </ul>
@@ -587,16 +579,6 @@
                 >Kontak</a
               >
             </li>
-            <li>
-              <a href="#" class="hover:text-yellow-400 transition-colors"
-                >FAQ</a
-              >
-            </li>
-            <li>
-              <a href="#" class="hover:text-yellow-400 transition-colors"
-                >Syarat & Ketentuan</a
-              >
-            </li>
           </ul>
         </div>
 
@@ -605,15 +587,15 @@
           <h4 class="text-lg font-bold mb-4">Kontak Kami</h4>
           <ul class="space-y-4 text-gray-300">
             <li class="flex items-start gap-3">
-              <span class="text-yellow-400">📍</span>
+              <span class="bi bi-geo-alt text-yellow-400"></span>
               <span>SMK Negeri 4 Padalarang</span>
             </li>
+            <!-- <li class="flex items-start gap-3">
+              <span class="bi bi-instagram"></span>
+              <span>@kepalicious</span>
+            </li> -->
             <li class="flex items-start gap-3">
-              <span class="text-yellow-400">✉️</span>
-              <span>info@kepalicious.com</span>
-            </li>
-            <li class="flex items-start gap-3">
-              <span class="text-yellow-400">📞</span>
+              <span class="bi bi-telephone text-yellow-400"></span>
               <span>+62 838-6234-4516</span>
             </li>
           </ul>
@@ -630,34 +612,34 @@
     <!-- Cart Sidebar -->
     <div
       id="cart-sidebar"
-      class="fixed top-0 right-0 w-96 h-full bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col"
+      class="fixed top-0 right-0 w-80 h-full bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col"
     >
       <!-- Cart Header -->
-      <div class="p-6 border-b bg-yellow-50 flex justify-between items-center">
-        <h2 class="text-xl font-bold">Keranjang Belanja</h2>
+      <div class="p-4 border-b bg-yellow-50 flex justify-between items-center">
+        <h2 class="text-lg font-bold">Keranjang Belanja</h2>
         <button
           id="close-cart"
-          class="text-gray-600 hover:text-red-500 transition-colors p-2"
+          class="text-gray-600 hover:text-red-500 transition-colors p-1"
         >
-          <i data-feather="x" class="w-6 h-6"></i>
+          <i data-feather="x" class="w-5 h-5"></i>
         </button>
       </div>
 
       <!-- Cart Items -->
-      <div id="cart-items" class="flex-1 overflow-y-auto p-6">
-        <div id="empty-cart" class="text-center py-12">
+      <div id="cart-items" class="flex-1 overflow-y-auto p-4">
+        <div id="empty-cart" class="text-center py-8">
           <i
             data-feather="shopping-cart"
-            class="w-16 h-16 text-gray-300 mx-auto mb-4"
+            class="w-10 h-10 text-gray-300 mx-auto mb-2"
           ></i>
-          <p class="text-gray-500 text-lg">Keranjang masih kosong</p>
-          <p class="text-gray-400">Yuk, pilih menu favoritmu!</p>
+          <p class="text-gray-500 text-base">Keranjang masih kosong</p>
+          <p class="text-gray-400 text-sm">Yuk, pilih menu favoritmu!</p>
         </div>
       </div>
 
       <!-- Cart Footer -->
-      <div id="cart-footer" class="p-6 border-t bg-gray-50 space-y-4 hidden">
-        <div class="flex justify-between items-center text-xl font-bold">
+      <div id="cart-footer" class="p-4 border-t bg-gray-50 space-y-2 hidden">
+        <div class="flex justify-between items-center text-base font-bold">
           <span>Total:</span>
           <span id="cart-total">Rp 0</span>
         </div>
@@ -665,32 +647,31 @@
         <div class="flex gap-2">
           <button
             id="clear-cart"
-            class="flex-1 bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-colors font-medium"
+            class="flex-1 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition-colors font-medium text-sm"
           >
-            <i data-feather="trash-2" class="w-4 h-4 inline mr-2"></i>
+            <i data-feather="trash-2" class="w-4 h-4 inline mr-1"></i>
             Kosongkan
           </button>
           <button
             id="whatsapp-checkout"
-            class="flex-1 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors font-medium"
+            class="flex-1 bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition-colors font-medium text-sm"
           >
-            <i data-feather="message-circle" class="w-4 h-4 inline mr-2"></i>
+            <i class="bi bi-whatsapp w-4 h-4 inline mr-1"></i>
             WhatsApp
           </button>
         </div>
-
         <button
-          id="qris-checkout"
-          class="w-full bg-yellow-400 text-white py-3 rounded-lg hover:bg-yellow-500 transition-colors font-medium"
+          id="cash-checkout"
+          class="w-full mt-1 bg-yellow-500 text-white py-2 rounded-lg hover:bg-yellow-600 transition-colors font-medium text-sm"
         >
-          <i data-feather="smartphone" class="w-4 h-4 inline mr-2"></i>
-          Bayar dengan QRIS
+          <i class="bi bi-cash-stack w-4 h-4 inline mr-1"></i>
+          Bayar Cash
         </button>
       </div>
     </div>
 
     <!-- QRIS Payment Modal -->
-    <div
+    <!-- <div
       id="qris-modal"
       class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4"
     >
@@ -730,7 +711,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Mobile Cart Button -->
     <button
@@ -745,6 +726,36 @@
       >
     </button>
 
+    <!-- Cash Modal -->
+    <div
+      id="cash-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4"
+      style="display: none"
+    >
+      <div class="bg-white rounded-xl max-w-md w-full p-6">
+        <div class="text-center">
+          <h3 class="text-xl font-bold mb-4">Konfirmasi Pembayaran Cash</h3>
+          <p class="mb-6 text-gray-700">
+            Silakan lakukan pembayaran secara tunai.<br />
+            Apakah Anda yakin ingin memilih metode pembayaran cash?
+          </p>
+          <div class="flex gap-3">
+            <button
+              id="cancel-cash"
+              class="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              Batal
+            </button>
+            <button
+              id="confirm-cash"
+              class="flex-1 bg-yellow-500 text-white py-2 rounded-lg hover:bg-yellow-600 transition-colors"
+            >
+              Sudah Bayar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Initialize Feather Icons -->
     <script>
       feather.replace();

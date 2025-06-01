@@ -5,12 +5,12 @@
 
 /* VARIABLES */
 :root {
-  --primary-yellow: #facc15;
+  --primary-yellow: #ffc800;
   --primary-yellow-hover: #eab308;
   --primary-orange: #fb923c;
   --text-dark: #1f2937;
   --text-gray: #6b7280;
-  --background-cream: #fffbeb;
+  --background-cream: #fffcf0;
   --shadow-light: 0 1px 3px 0 rgb(0 0 0 / 0.1);
   --shadow-medium: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   --shadow-large: 0 10px 15px -3px rgb(0 0 0 / 0.1);

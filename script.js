@@ -5,30 +5,42 @@ let cart = JSON.parse(localStorage.getItem("cart")) || [];
 const menuData = [
   {
     id: 1,
-    name: "Nasi Kepal Ayam Suwir",
+    name: "Nasi Kepal",
     price: 6000,
     category: "nasi-kepal",
-    image: "/assets/images/nasi-kepal.jpg",
+    description: "Nasi kepal dengan isi Ayam Suwir",
+    image: "assets/images/nasi-kepal.jpg", // Hapus leading slash
   },
   {
     id: 2,
     name: "Kimbab",
     price: 6000,
     category: "kimbab",
-    image: "/assets/images/kimbab.jpg",
+    description: "Kimbab isi Sayuran",
+    image: "assets/images/kimbab.jpg", // Hapus leading slash
   },
 ];
 
 // Variabel untuk mengelola timeout notifikasi
 let notificationTimeout = null;
 
-// Simpan ke localStorage
+// Simpan ke localStorage dengan error handling
 function saveCart() {
-  localStorage.setItem("cart", JSON.stringify(cart));
+  try {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  } catch (error) {
+    console.error("Error saving cart to localStorage:", error);
+    showNotification("Gagal menyimpan keranjang", "error");
+  }
 }
 
 // Tambah item ke keranjang
 function addToCart(name, price) {
+  if (!name || !price || price <= 0) {
+    showNotification("Data item tidak valid", "error");
+    return;
+  }
+
   const existingItem = cart.find((item) => item.name === name);
 
   if (existingItem) {
@@ -40,8 +52,6 @@ function addToCart(name, price) {
   saveCart();
   updateCartDisplay();
   showNotification("Item berhasil ditambahkan ke keranjang!");
-
-  // Jangan tutup cart sidebar - biarkan tetap terbuka jika sudah terbuka
 }
 
 // Update tampilan keranjang
@@ -50,20 +60,26 @@ function updateCartDisplay() {
   updateCartCount();
 }
 
-// Render keranjang
+// Render keranjang dengan error handling
 function renderCart() {
   const cartItemsEl = document.getElementById("cart-items");
   const emptyCartEl = document.getElementById("empty-cart");
   const cartFooterEl = document.getElementById("cart-footer");
 
-  if (!cartItemsEl) return;
+  if (!cartItemsEl) {
+    console.warn("Cart items element not found");
+    return;
+  }
 
-  // Clear existing items
-  cartItemsEl.innerHTML = "";
+  // Hapus semua item hasil render sebelumnya, tapi biarkan #empty-cart tetap ada
+  Array.from(cartItemsEl.children).forEach((child) => {
+    if (child.id !== "empty-cart") cartItemsEl.removeChild(child);
+  });
 
   if (cart.length === 0) {
     if (emptyCartEl) emptyCartEl.style.display = "block";
     if (cartFooterEl) cartFooterEl.classList.add("hidden");
+    // Tidak perlu render item apapun
     return;
   }
 
@@ -71,43 +87,102 @@ function renderCart() {
   if (cartFooterEl) cartFooterEl.classList.remove("hidden");
 
   let total = 0;
+  let subtotalHtml = "";
 
   cart.forEach((item, index) => {
-    const itemEl = document.createElement("div");
-    itemEl.className = "cart-item border-b pb-4 mb-4";
+    if (!item || !item.name || !item.price || !item.qty) {
+      console.warn("Invalid cart item:", item);
+      return;
+    }
 
     const itemTotal = item.price * item.qty;
     total += itemTotal;
 
+    subtotalHtml += `
+    <div class="flex justify-between items-center text-xs text-gray-700 mb-1">
+      <span>${escapeHtml(item.name)} x${item.qty}</span>
+      <span>Rp ${itemTotal.toLocaleString()}</span>
+    </div>
+  `;
+
+    const itemEl = document.createElement("div");
+    itemEl.className =
+      "cart-item border border-gray-200 rounded-md pb-2 mb-2 px-2 py-2 bg-white"; // outline tiap item
+
     itemEl.innerHTML = `
-      <div class="flex justify-between items-center">
-        <div class="flex-1">
-          <h4 class="font-semibold text-gray-800">${item.name}</h4>
-          <p class="text-sm text-gray-600">Rp ${item.price.toLocaleString()}</p>
-          <p class="text-sm font-medium text-yellow-600">Subtotal: Rp ${itemTotal.toLocaleString()}</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <button onclick="changeQty(${index}, -1)" class="quantity-btn bg-gray-200 hover:bg-red-200 text-gray-700 w-8 h-8 rounded-full flex items-center justify-center">−</button>
-          <span class="mx-2 font-medium w-8 text-center">${item.qty}</span>
-          <button onclick="changeQty(${index}, 1)" class="quantity-btn bg-gray-200 hover:bg-green-200 text-gray-700 w-8 h-8 rounded-full flex items-center justify-center">+</button>
-          <button onclick="removeItem(${index})" class="ml-2 text-red-500 hover:text-red-700 w-8 h-8 rounded-full flex items-center justify-center">×</button>
-        </div>
+  <div class="flex justify-between items-center gap-2">
+    <div class="flex-1">
+      <h4 class="font-semibold text-xs text-gray-800 mb-1">${escapeHtml(
+        item.name
+      )}</h4>
+      <p class="text-xs text-gray-600">Rp ${item.price.toLocaleString()}</p>
+    </div>
+    <div class="flex items-center gap-1">
+      <div class="flex items-center border border-gray-300 rounded px-1 py-0.5 bg-white"> <!-- outline tombol -->
+        <button onclick="changeQty(${index}, -1)" class="quantity-btn text-gray-700 w-5 h-5 flex items-center justify-center text-xs" aria-label="Kurangi jumlah">−</button>
+        <span class="mx-1 font-medium w-5 text-center text-xs">${
+          item.qty
+        }</span>
+        <button onclick="changeQty(${index}, 1)" class="quantity-btn text-gray-700 w-5 h-5 flex items-center justify-center text-xs" aria-label="Tambah jumlah">+</button>
       </div>
-    `;
+      <button onclick="removeItem(${index})" class="ml-1 text-red-500 hover:text-red-700 w-5 h-5 rounded-full flex items-center justify-center text-xs" aria-label="Hapus item">×</button>
+    </div>
+  </div>
+`;
 
     cartItemsEl.appendChild(itemEl);
   });
 
+  // Tampilkan subtotal di atas total
+  const cartFooter = document.getElementById("cart-footer");
+  if (cartFooter) {
+    // Sisipkan subtotal sebelum total
+    cartFooter.innerHTML =
+      `<div class="mb-2 border-b pb-2">
+      <div class="font-semibold text-xs text-gray-500 mb-1">Subtotal per item:</div>
+      ${subtotalHtml}
+    </div>` +
+      `<div class="flex justify-between items-center text-base font-bold">
+      <span>Total:</span>
+      <span id="cart-total">Rp ${total.toLocaleString()}</span>
+    </div>
+    <div class="flex gap-2 mt-2">
+      <button id="clear-cart" class="flex-1 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition-colors font-medium text-sm">
+        <i data-feather="trash-2" class="w-4 h-4 inline mr-1"></i>
+        Kosongkan
+      </button>
+      <button id="whatsapp-checkout" class="flex-1 bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition-colors font-medium text-sm">
+        <i class="bi bi-whatsapp w-4 h-4 inline mr-1"></i>
+        WhatsApp
+      </button>
+    </div>
+    <button id="cash-checkout" class="w-full mt-1 bg-yellow-500 text-white py-2 rounded-lg hover:bg-yellow-600 transition-colors font-medium text-sm">
+      <i class="bi bi-cash-stack w-4 h-4 inline mr-1"></i>
+      Bayar Cash
+    </button>`;
+  }
+
   // Update total
   const totalEl = document.getElementById("cart-total");
-  const qrisTotalEl = document.getElementById("qris-total");
   if (totalEl) totalEl.innerText = `Rp ${total.toLocaleString()}`;
-  if (qrisTotalEl) qrisTotalEl.innerText = `Rp ${total.toLocaleString()}`;
+}
+// Helper function untuk escape HTML
+function escapeHtml(text) {
+  const map = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  };
+  return text.replace(/[&<>"']/g, function (m) {
+    return map[m];
+  });
 }
 
 // Update jumlah item di cart badge
 function updateCartCount() {
-  const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+  const totalItems = cart.reduce((sum, item) => sum + (item.qty || 0), 0);
   const cartCountEl = document.getElementById("cart-count");
   const mobileCartCountEl = document.getElementById("mobile-cart-count");
 
@@ -122,16 +197,20 @@ function updateCartCount() {
   }
 }
 
-// Ubah jumlah item
+// Ubah jumlah item dengan validasi
 function changeQty(index, amount) {
-  if (!cart[index]) return;
+  if (!cart[index] || typeof amount !== "number") {
+    console.warn("Invalid changeQty parameters:", index, amount);
+    return;
+  }
 
   const oldQty = cart[index].qty;
   cart[index].qty += amount;
 
   if (cart[index].qty <= 0) {
+    const itemName = cart[index].name;
     cart.splice(index, 1);
-    showNotification("Item dihapus dari keranjang", "warning");
+    showNotification(`${itemName} dihapus dari keranjang`, "warning");
   } else if (amount > 0) {
     showNotification("Jumlah item ditambah", "success");
   } else {
@@ -140,21 +219,20 @@ function changeQty(index, amount) {
 
   saveCart();
   updateCartDisplay();
-
-  // Cart sidebar tetap terbuka - tidak ada perintah untuk menutup
 }
 
-// Hapus item
+// Hapus item dengan validasi
 function removeItem(index) {
-  if (!cart[index]) return;
+  if (!cart[index]) {
+    console.warn("Invalid removeItem index:", index);
+    return;
+  }
 
   const itemName = cart[index].name;
   cart.splice(index, 1);
   saveCart();
   updateCartDisplay();
   showNotification(`${itemName} berhasil dihapus dari keranjang`, "error");
-
-  // Cart sidebar tetap terbuka - tidak ada perintah untuk menutup
 }
 
 // Kosongkan keranjang
@@ -168,98 +246,83 @@ function clearCart() {
   saveCart();
   updateCartDisplay();
   showNotification("Keranjang berhasil dikosongkan", "success");
-
-  // Cart sidebar tetap terbuka - pengguna mungkin ingin menambah item lagi
 }
 
-// Tampilkan notifikasi - POSISI KANAN BAWAH DENGAN ANIMASI SMOOTH
+// Tampilkan notifikasi dengan perbaikan
 function showNotification(message, type = "success", duration = 3000) {
-  // Hapus notifikasi yang sudah ada
-  const existingNotification = document.getElementById("notification");
-  if (existingNotification) {
-    existingNotification.remove();
+  if (!message) {
+    console.warn("Notification message is empty");
+    return;
   }
 
-  // Clear timeout sebelumnya jika ada
-  if (notificationTimeout) {
-    clearTimeout(notificationTimeout);
-  }
+  // Hapus notifikasi yang sudah ada
+  closeNotification();
 
   // Buat elemen notifikasi baru
   const notification = document.createElement("div");
   notification.id = "notification";
 
   // Set class berdasarkan type
-  const bgColor =
-    type === "success"
-      ? "bg-green-500"
-      : type === "error"
-      ? "bg-red-500"
-      : type === "warning"
-      ? "bg-yellow-500"
-      : "bg-blue-500";
+  const typeConfig = {
+    success: { bg: "bg-green-500", icon: "✓" },
+    error: { bg: "bg-red-500", icon: "✗" },
+    warning: { bg: "bg-yellow-500", icon: "⚠" },
+    info: { bg: "bg-blue-500", icon: "ℹ" },
+  };
 
-  notification.className = `fixed bottom-4 right-4 z-50 px-6 py-4 rounded-lg shadow-xl text-white ${bgColor} 
+  const config = typeConfig[type] || typeConfig.info;
+
+  notification.className = `fixed bottom-4 right-4 z-50 px-6 py-4 rounded-lg shadow-xl text-white ${config.bg} 
                            transform translate-x-full transition-all duration-500 ease-in-out 
                            cursor-pointer hover:shadow-2xl flex items-center gap-3 max-w-sm`;
 
-  // Tambahkan icon berdasarkan type
-  const icon =
-    type === "success"
-      ? "✓"
-      : type === "error"
-      ? "✗"
-      : type === "warning"
-      ? "⚠"
-      : "ℹ";
-
   notification.innerHTML = `
     <div class="flex items-center gap-3">
-      <span class="text-xl font-bold">${icon}</span>
+      <span class="text-xl font-bold">${config.icon}</span>
       <div>
-        <span class="font-medium">${message}</span>
+        <span class="font-medium">${escapeHtml(message)}</span>
         <div class="text-xs opacity-80 mt-1">Klik untuk menutup</div>
       </div>
-      <button onclick="closeNotification()" class="ml-auto text-white hover:text-gray-200 text-xl font-bold leading-none">×</button>
+      <button class="close-notification-btn ml-auto text-white hover:text-gray-200 text-xl font-bold leading-none" aria-label="Tutup notifikasi">×</button>
     </div>
   `;
 
   // Tambahkan ke body
   document.body.appendChild(notification);
 
-  console.log("Notification created:", message);
+  // Event listener untuk close button
+  const closeBtn = notification.querySelector(".close-notification-btn");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeNotification();
+    });
+  }
 
-  // Trigger animasi masuk setelah elemen ditambahkan ke DOM
-  setTimeout(() => {
-    notification.style.transform = "translateX(0)";
-    console.log("Notification animated in");
-  }, 50);
-
-  // Event listener untuk menutup dengan klik
+  // Event listener untuk menutup dengan klik pada notifikasi
   notification.addEventListener("click", closeNotification);
+
+  // Trigger animasi masuk
+  requestAnimationFrame(() => {
+    notification.style.transform = "translateX(0)";
+  });
 
   // Auto hide setelah duration
   notificationTimeout = setTimeout(() => {
-    console.log("Auto hiding notification");
     hideNotification();
   }, duration);
 }
 
-// Sembunyikan notifikasi dengan animasi smooth
+// Sembunyikan notifikasi dengan animasi
 function hideNotification() {
   const notification = document.getElementById("notification");
   if (notification) {
-    console.log("Hiding notification with animation");
-
-    // Animasi keluar ke kanan
     notification.style.transform = "translateX(100%)";
     notification.style.opacity = "0";
 
-    // Hapus elemen setelah animasi selesai
     setTimeout(() => {
       if (notification && notification.parentNode) {
         notification.remove();
-        console.log("Notification removed from DOM");
       }
     }, 500);
   }
@@ -267,7 +330,6 @@ function hideNotification() {
 
 // Tutup notifikasi manual
 function closeNotification() {
-  console.log("Manual close notification");
   if (notificationTimeout) {
     clearTimeout(notificationTimeout);
     notificationTimeout = null;
@@ -275,35 +337,49 @@ function closeNotification() {
   hideNotification();
 }
 
-// Fungsi sederhana untuk test notifikasi
-function testNotification() {
-  showNotification("Test notification - ini akan hilang dalam 3 detik!");
-}
-
-// Load menu items
+// Load menu items dengan error handling
 function loadMenu() {
   const menuContainer = document.getElementById("menu-container");
-  if (!menuContainer) return;
+  if (!menuContainer) {
+    console.warn("Menu container not found");
+    return;
+  }
 
   menuContainer.innerHTML = "";
 
+  if (!menuData || menuData.length === 0) {
+    menuContainer.innerHTML =
+      '<p class="text-center text-gray-500 col-span-full">Menu tidak tersedia</p>';
+    return;
+  }
+
   menuData.forEach((item) => {
+    if (!item || !item.name || !item.price) {
+      console.warn("Invalid menu item:", item);
+      return;
+    }
+
     const menuItem = document.createElement("div");
-    menuItem.className =
-      "bg-white rounded-xl shadow-lg overflow-hidden hover:scale-105 transition-transform duration-300";
+    menuItem.className = "bg-white rounded-xl shadow-lg overflow-hidden ";
 
     menuItem.innerHTML = `
-      <img src="${item.image}" alt="${
-      item.name
-    }" class="w-full h-48 object-cover">
+      <img src="${escapeHtml(item.image || "assets/images/placeholder.jpg")}" 
+           alt="${escapeHtml(item.name)}" 
+           class="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
+           onerror="this.src='assets/images/placeholder.jpg'">
       <div class="p-4">
-        <h3 class="font-bold text-lg mb-2">${item.name}</h3>
-        <p class="text-gray-600 mb-3">Rp ${item.price.toLocaleString()}</p>
-        <button onclick="addToCart('${item.name}', ${item.price})" 
-                class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
-          Tambah ke Keranjang
-        </button>
-      </div>
+  <h3 class="font-bold text-lg mb-2">${escapeHtml(item.name)}</h3>
+  <p class="text-gray-500 text-sm mb-3">${escapeHtml(
+    item.description || ""
+  )}</p>
+  <div class="flex items-center justify-between">
+    <p class="text-gray-600 text-base font-semibold">Rp ${item.price.toLocaleString()}</p>
+    <button onclick="addToCart('${escapeHtml(item.name)}', ${item.price})" 
+      class="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-1 px-3 rounded-md text-sm transition-colors">
+      + Keranjang
+    </button>
+  </div>
+</div>
     `;
 
     menuContainer.appendChild(menuItem);
@@ -320,21 +396,30 @@ function filterMenu(category) {
   const filteredItems =
     category === "all"
       ? menuData
-      : menuData.filter((item) => item.category === category);
+      : menuData.filter((item) => item && item.category === category);
+
+  if (filteredItems.length === 0) {
+    menuContainer.innerHTML =
+      '<p class="text-center text-gray-500 col-span-full">Tidak ada menu dalam kategori ini</p>';
+    return;
+  }
 
   filteredItems.forEach((item) => {
+    if (!item || !item.name || !item.price) return;
+
     const menuItem = document.createElement("div");
     menuItem.className =
       "bg-white rounded-xl shadow-lg overflow-hidden hover:scale-105 transition-transform duration-300";
 
     menuItem.innerHTML = `
-      <img src="${item.image}" alt="${
-      item.name
-    }" class="w-full h-48 object-cover">
+      <img src="${escapeHtml(item.image || "assets/images/placeholder.jpg")}" 
+           alt="${escapeHtml(item.name)}" 
+           class="w-full h-48 object-cover"
+           onerror="this.src='assets/images/placeholder.jpg'">
       <div class="p-4">
-        <h3 class="font-bold text-lg mb-2">${item.name}</h3>
+        <h3 class="font-bold text-lg mb-2">${escapeHtml(item.name)}</h3>
         <p class="text-gray-600 mb-3">Rp ${item.price.toLocaleString()}</p>
-        <button onclick="addToCart('${item.name}', ${item.price})" 
+        <button onclick="addToCart('${escapeHtml(item.name)}', ${item.price})" 
                 class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
           Tambah ke Keranjang
         </button>
@@ -345,70 +430,75 @@ function filterMenu(category) {
   });
 }
 
-// Checkout WhatsApp
+// Checkout WhatsApp dengan validasi
 function whatsappCheckout() {
   if (cart.length === 0) {
     showNotification("Keranjang masih kosong!", "error");
     return;
   }
 
-  let message = "Halo, saya ingin memesan:\n\n";
-  let total = 0;
+  try {
+    let message = "Halo, saya ingin memesan:\n\n";
+    let total = 0;
 
-  cart.forEach((item) => {
-    const subtotal = item.price * item.qty;
-    total += subtotal;
-    message += `• ${item.qty}x ${
-      item.name
-    } - Rp ${subtotal.toLocaleString()}\n`;
-  });
+    cart.forEach((item) => {
+      if (item && item.name && item.price && item.qty) {
+        const subtotal = item.price * item.qty;
+        total += subtotal;
+        message += `• ${item.qty}x ${
+          item.name
+        } - Rp ${subtotal.toLocaleString()}\n`;
+      }
+    });
 
-  message += `\nTotal: Rp ${total.toLocaleString()}\n\nTerima kasih!`;
+    message += `\nTotal: Rp ${total.toLocaleString()}\n\nTerima kasih!`;
 
-  const whatsappURL = `https://wa.me/6283862344516?text=${encodeURIComponent(
-    message
-  )}`;
-  window.open(whatsappURL, "_blank");
+    const whatsappURL = `https://wa.me/6283862344516?text=${encodeURIComponent(
+      message
+    )}`;
+    window.open(whatsappURL, "_blank");
+
+    showNotification("Pesanan dikirim ke WhatsApp!", "success");
+  } catch (error) {
+    console.error("Error creating WhatsApp message:", error);
+    showNotification("Gagal membuat pesan WhatsApp", "error");
+  }
 }
 
-// QRIS Checkout
-function qrisCheckout() {
+// Modal functions
+function openCashModal() {
   if (cart.length === 0) {
     showNotification("Keranjang masih kosong!", "error");
     return;
   }
 
-  const qrisModal = document.getElementById("qris-modal");
-  if (qrisModal) {
-    qrisModal.classList.remove("hidden");
-    qrisModal.classList.add("flex");
+  const cashModal = document.getElementById("cash-modal");
+  if (cashModal) {
+    cashModal.style.display = "flex";
+    // Focus trap untuk accessibility
+    const firstButton = cashModal.querySelector("button");
+    if (firstButton) firstButton.focus();
   }
 }
 
-// Tutup QRIS Modal
-function closeQrisModal() {
-  const qrisModal = document.getElementById("qris-modal");
-  if (qrisModal) {
-    qrisModal.classList.add("hidden");
-    qrisModal.classList.remove("flex");
+function closeCashModal() {
+  const cashModal = document.getElementById("cash-modal");
+  if (cashModal) {
+    cashModal.style.display = "none";
   }
 }
 
-// Konfirmasi pembayaran
-function confirmPayment() {
-  showNotification("Pembayaran berhasil!", "success");
+function confirmCashPayment() {
+  showNotification(
+    "Pesanan cash Anda telah dikonfirmasi! Silakan bayar saat pesanan diantar/diambil.",
+    "success"
+  );
   clearCart();
-  closeQrisModal();
+  closeCashModal();
 }
 
-// Event listeners
-document.addEventListener("DOMContentLoaded", function () {
-  // Load menu saat halaman dimuat
-  loadMenu();
-
-  // Update tampilan keranjang saat halaman dimuat
-  updateCartDisplay();
-
+// Initialize semua event listeners
+function initializeEventListeners() {
   // Mobile menu toggle
   const menuToggle = document.getElementById("menu-toggle");
   const navMenu = document.getElementById("nav-menu");
@@ -446,7 +536,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Cart action buttons
   const clearCartBtn = document.getElementById("clear-cart");
   const whatsappBtn = document.getElementById("whatsapp-checkout");
-  const qrisBtn = document.getElementById("qris-checkout");
+  const cashBtn = document.getElementById("cash-checkout");
 
   if (clearCartBtn) {
     clearCartBtn.addEventListener("click", clearCart);
@@ -456,35 +546,33 @@ document.addEventListener("DOMContentLoaded", function () {
     whatsappBtn.addEventListener("click", whatsappCheckout);
   }
 
-  if (qrisBtn) {
-    qrisBtn.addEventListener("click", qrisCheckout);
+  if (cashBtn) {
+    cashBtn.addEventListener("click", openCashModal);
   }
 
-  // QRIS modal controls
-  const closeQrisBtn = document.getElementById("close-qris");
-  const confirmPaymentBtn = document.getElementById("confirm-payment");
+  // Cash modal controls
+  const cancelCash = document.getElementById("cancel-cash");
+  const confirmCash = document.getElementById("confirm-cash");
 
-  if (closeQrisBtn) {
-    closeQrisBtn.addEventListener("click", closeQrisModal);
+  if (cancelCash) {
+    cancelCash.addEventListener("click", closeCashModal);
   }
 
-  if (confirmPaymentBtn) {
-    confirmPaymentBtn.addEventListener("click", confirmPayment);
+  if (confirmCash) {
+    confirmCash.addEventListener("click", confirmCashPayment);
   }
 
   // Category filter buttons
   const categoryButtons = document.querySelectorAll(".category-filter");
   categoryButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      // Remove active class from all buttons
       categoryButtons.forEach((btn) => btn.classList.remove("active"));
-
-      // Add active class to clicked button
       button.classList.add("active");
 
-      // Filter menu
       const category = button.getAttribute("data-category");
-      filterMenu(category);
+      if (category) {
+        filterMenu(category);
+      }
     });
   });
 
@@ -514,7 +602,6 @@ document.addEventListener("DOMContentLoaded", function () {
           block: "start",
         });
 
-        // Tutup menu mobile setelah klik
         if (navMenu) {
           navMenu.classList.add("hidden");
         }
@@ -522,40 +609,29 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Event listener untuk menutup notifikasi dengan tombol ESC
+  // Keyboard event listeners
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       closeNotification();
+      closeCashModal();
 
-      // Tutup modal QRIS jika terbuka
-      const qrisModal = document.getElementById("qris-modal");
-      if (qrisModal && !qrisModal.classList.contains("hidden")) {
-        closeQrisModal();
-      }
-
-      // Tutup cart sidebar jika terbuka - HANYA DENGAN ESC
       if (cartSidebar && !cartSidebar.classList.contains("translate-x-full")) {
         cartSidebar.classList.add("translate-x-full");
       }
     }
   });
 
-  // Click outside untuk menutup cart sidebar - HANYA TUTUP SAAT CLICK OUTSIDE
+  // Click outside untuk menutup cart sidebar
   document.addEventListener("click", (e) => {
     if (cartSidebar && !cartSidebar.classList.contains("translate-x-full")) {
-      // Cek apakah click berada di luar sidebar dan bukan tombol pembuka
-      // Juga pastikan bukan tombol-tombol dalam sidebar (add, remove, quantity)
       const isClickOutside =
         !cartSidebar.contains(e.target) &&
         !openCartBtn?.contains(e.target) &&
         !mobileCartBtn?.contains(e.target);
 
-      // Jangan tutup jika click pada tombol "Tambah ke Keranjang" di menu
       const isAddToCartButton = e.target.closest(
         'button[onclick*="addToCart"]'
       );
-
-      // Jangan tutup jika click pada tombol quantity atau remove dalam cart
       const isCartActionButton =
         e.target.closest(".quantity-btn") ||
         e.target.closest('button[onclick*="changeQty"]') ||
@@ -568,18 +644,45 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Click outside untuk menutup QRIS modal
-  const qrisModal = document.getElementById("qris-modal");
-  if (qrisModal) {
-    qrisModal.addEventListener("click", (e) => {
-      if (e.target === qrisModal) {
-        closeQrisModal();
+  // Click outside untuk menutup cash modal
+  const cashModal = document.getElementById("cash-modal");
+  if (cashModal) {
+    cashModal.addEventListener("click", (e) => {
+      if (e.target === cashModal) {
+        closeCashModal();
       }
     });
   }
+}
+
+// Main initialization
+document.addEventListener("DOMContentLoaded", function () {
+  try {
+    // Load menu dan update tampilan
+    loadMenu();
+    updateCartDisplay();
+
+    // Initialize semua event listeners
+    initializeEventListeners();
+
+    // Initialize Feather icons jika tersedia
+    if (typeof feather !== "undefined") {
+      feather.replace();
+    }
+
+    console.log("Application initialized successfully");
+  } catch (error) {
+    console.error("Error initializing application:", error);
+    showNotification("Terjadi kesalahan saat memuat aplikasi", "error");
+  }
 });
 
-// Initialize Feather icons jika sudah dimuat
-if (typeof feather !== "undefined") {
-  feather.replace();
+// Export functions untuk testing (opsional)
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = {
+    addToCart,
+    removeItem,
+    clearCart,
+    updateCartDisplay,
+  };
 }
