@@ -135,6 +135,7 @@ function renderCart() {
 
   // Tampilkan subtotal di atas total
   const cartFooter = document.getElementById("cart-footer");
+  // ...existing code...
   if (cartFooter) {
     // Sisipkan subtotal sebelum total
     cartFooter.innerHTML =
@@ -160,8 +161,17 @@ function renderCart() {
       <i class="bi bi-cash-stack w-4 h-4 inline mr-1"></i>
       Bayar Cash
     </button>`;
-  }
 
+    // PASANG ULANG EVENT LISTENER SETELAH RENDER
+    const clearCartBtn = document.getElementById("clear-cart");
+    const whatsappBtn = document.getElementById("whatsapp-checkout");
+    const cashBtn = document.getElementById("cash-checkout");
+
+    if (clearCartBtn) clearCartBtn.addEventListener("click", clearCart);
+    if (whatsappBtn) whatsappBtn.addEventListener("click", whatsappCheckout);
+    if (cashBtn) cashBtn.addEventListener("click", openCashModal);
+  }
+  // ...existing code...
   // Update total
   const totalEl = document.getElementById("cart-total");
   if (totalEl) totalEl.innerText = `Rp ${total.toLocaleString()}`;
